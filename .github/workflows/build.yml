@@ -1,8 +1,8 @@
 name: Build
 on:
   push:
-    # branches:
-    #   - main
+    branches:
+      - main
 jobs:
   front-build:
     runs-on: ubuntu-latest
@@ -16,6 +16,19 @@ jobs:
           cache-dependency-path: |
             CommentGenerator/yarn.lock
             SettingApp/yarn.lock
+      - name: yarn install
+        working-directory: CommentGenerator
+        run: |
+          yarn install --frozen-lockfile
+      - name: yarn build
+        working-directory: CommentGenerator
+        run: |
+          yarn build
+      - name: Upload math result for job 1
+        uses: actions/upload-artifact@v3
+        with:
+          name: front-build
+          path: CommentGenerator/dist/win-unpacked
   app-build:
     runs-on: windows-latest
     steps:
@@ -69,15 +82,20 @@ jobs:
     steps:
       - name: create Artifact dir
         run: mkdir artifact
-      - name: Download MCVPlugin
+      - name: Download front-build
         uses: actions/download-artifact@v3
         with:
-          name: MCVPlugin.dll
+          name: front-build
           path: artifact
       - name: Download app-build
         uses: actions/download-artifact@v3
         with:
           name: app-build
+          path: artifact
+      - name: Download MCVPlugin
+        uses: actions/download-artifact@v3
+        with:
+          name: MCVPlugin.dll
           path: artifact
       - name: Upload result
         uses: actions/upload-artifact@v3
