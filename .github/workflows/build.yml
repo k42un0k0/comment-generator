@@ -73,16 +73,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: MCVPlugin.dll
+          path: artifact
       - name: Download app-build
         uses: actions/download-artifact@v3
         with:
           name: app-build
-      - name: ls
-        run: ls -la
-      - name: move files
-        run: |
-          mv MCVPlugin.dll ./artifact
-          mv app-build/* ./artifact
+          path: artifact
       - name: Upload result
         uses: actions/upload-artifact@v3
         with:
