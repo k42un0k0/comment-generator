@@ -9,15 +9,8 @@
     "dev": "run-p dev:*",
     "build": "cross-env NODE_ENV=\"production\" webpack --progress && electron-builder",
     "predev": "rimraf build",
-    "prepare": "husky install",
     "dev:webpack": "cross-env NODE_ENV=\"development\" webpack --progress",
     "dev:electron": "wait-on ./build/index.html ./build/main.js && electronmon ."
-  },
-  "lint-staged": {
-    "src/**/*": [
-      "yarn prettier",
-      "yarn eslint"
-    ]
   },
   "electronmon": {
     "patterns": [
