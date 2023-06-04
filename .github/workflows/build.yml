@@ -1,0 +1,92 @@
+name: Build
+on:
+  push:
+    # branches:
+    #   - main
+jobs:
+  front-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: yarn
+          cache-dependency-path: |
+            CommentGenerator/yarn.lock
+            SettingApp/yarn.lock
+  app-build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: yarn
+          cache-dependency-path: |
+            CommentGenerator/yarn.lock
+            SettingApp/yarn.lock
+      - name: yarn install
+        working-directory: SettingApp
+        run: |
+          yarn install --frozen-lockfile
+      - name: yarn build
+        working-directory: SettingApp
+        run: |
+          ls
+      - name: yarn build
+        working-directory: SettingApp
+        run: |
+          yarn build
+      - name: Upload math result for job 2
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-build
+          path: SettingApp/dist/win-unpacked
+  mcv-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+      - name: Install dependencies
+        run: dotnet restore
+        working-directory: MCVPlugin
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+        working-directory: MCVPlugin
+      - name: Upload math result for job 3
+        uses: actions/upload-artifact@v3
+        with:
+          name: MCVPlugin.dll
+          path: MCVPlugin/MCVPlugin/bin/Release/net462/MCVPlugin.dll
+  zip:
+    needs:
+      - front-build
+      - app-build
+      - mcv-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: create Artifact dir
+        run: mkdir artifact
+      - name: Download MCVPlugin
+        uses: actions/download-artifact@v3
+        with:
+          name: MCVPlugin.dll
+      - name: Download app-build
+        uses: actions/download-artifact@v3
+        with:
+          name: app-build
+      - name: move files
+        run: |
+          mv MCVPlugin.dll ./artifact
+          mv app-build/* ./artifact
+      - name: Upload result
+        uses: actions/upload-artifact@v3
+        with:
+          name: CommentGenerator
+          path: artifact
