@@ -35,10 +35,6 @@ jobs:
       - name: yarn build
         working-directory: SettingApp
         run: |
-          ls
-      - name: yarn build
-        working-directory: SettingApp
-        run: |
           yarn build
       - name: Upload math result for job 2
         uses: actions/upload-artifact@v3
@@ -81,6 +77,8 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: app-build
+      - name: ls
+        run: ls -la
       - name: move files
         run: |
           mv MCVPlugin.dll ./artifact
